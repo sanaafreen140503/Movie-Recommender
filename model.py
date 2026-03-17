@@ -2,10 +2,10 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Load dataset
+# Load dataset (CSV in root folder)
 movies = pd.read_csv('dataset/tmdb_5000_movies.csv')
 
-# Select required columns (FIXED: id instead of movie_id)
+# Select required columns
 movies = movies[['id', 'title', 'overview']]
 
 # Remove missing values
@@ -15,7 +15,7 @@ movies.dropna(inplace=True)
 cv = CountVectorizer(max_features=5000, stop_words='english')
 vectors = cv.fit_transform(movies['overview']).toarray()
 
-# Compute similarity
+# Compute similarity matrix
 similarity = cosine_similarity(vectors)
 
 # Recommendation function
@@ -33,7 +33,7 @@ def recommend(movie):
     movie_ids = []
 
     for i in movie_list:
-        movie_ids.append(movies.iloc[i[0]].id)   # FIXED
+        movie_ids.append(movies.iloc[i[0]].id)
         recommended_movies.append(movies.iloc[i[0]].title)
 
     return recommended_movies, movie_ids
