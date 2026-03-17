@@ -1,5 +1,5 @@
 streamlit
 pandas
-requests
 scikit-learn
-numpy
+requests
+python-dotenv
