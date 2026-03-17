@@ -17,6 +17,10 @@ cv = CountVectorizer(max_features=5000,stop_words='english')
 vectors = cv.fit_transform(movies['overview']).toarray()
 
 similarity = cosine_similarity(vectors)
+#similarity = cosine_similarity(vectors)
 
 pickle.dump(movies,open('movies.pkl','wb'))
-pickle.dump(similarity,open('similarity.pkl','wb'))
+
+from model import similarity
+
+#pickle.dump(similarity,open('similarity.pkl','wb'))
