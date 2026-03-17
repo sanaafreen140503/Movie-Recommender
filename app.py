@@ -1,19 +1,15 @@
 import streamlit as st
-import pickle
 import requests
 import concurrent.futures
 import os
 from dotenv import load_dotenv
+from model import movies, recommend   # ✅ Import from model.py
 
 # Load environment variables
 load_dotenv()
 
 # Get API key securely
 api_key = os.getenv("TMDB_API_KEY")
-
-# Load data
-movies = pickle.load(open("movies.pkl", "rb"))
-similarity = pickle.load(open("similarity.pkl", "rb"))
 
 # Page configuration
 st.set_page_config(page_title="Movie Recommender", layout="wide")
@@ -44,34 +40,6 @@ def fetch_poster(movie_id):
 
 
 # ----------------------------
-# Recommendation Function
-# ----------------------------
-def recommend(movie):
-
-    movie_index = movies[movies['title'] == movie].index[0]
-    distances = similarity[movie_index]
-
-    movie_list = sorted(
-        list(enumerate(distances)),
-        reverse=True,
-        key=lambda x: x[1]
-    )[1:6]
-
-    recommended_movies = []
-    movie_ids = []
-
-    for i in movie_list:
-        movie_ids.append(movies.iloc[i[0]].movie_id)
-        recommended_movies.append(movies.iloc[i[0]].title)
-
-    # Fetch posters in parallel (faster)
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        posters = list(executor.map(fetch_poster, movie_ids))
-
-    return recommended_movies, posters
-
-
-# ----------------------------
 # UI
 # ----------------------------
 st.title("🎬 Movie Recommendation System")
@@ -85,7 +53,11 @@ if st.button("Recommend"):
 
     with st.spinner("Loading recommendations... 🎬"):
 
-        names, posters = recommend(selected_movie)
+        names, movie_ids = recommend(selected_movie)   # ✅ get IDs from model
+
+        # Fetch posters
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            posters = list(executor.map(fetch_poster, movie_ids))
 
     col1, col2, col3, col4, col5 = st.columns(5)
     cols = [col1, col2, col3, col4, col5]
