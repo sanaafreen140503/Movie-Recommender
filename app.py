@@ -3,15 +3,15 @@ import requests
 import concurrent.futures
 import os
 from dotenv import load_dotenv
-from model import movies, recommend   # ✅ Import from model.py
+from model import movies, recommend   # ✅ IMPORT FROM MODEL
 
 # Load environment variables
 load_dotenv()
 
-# Get API key securely
+# Get API key
 api_key = os.getenv("TMDB_API_KEY")
 
-# Page configuration
+# Page config
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 
 # ----------------------------
@@ -38,7 +38,6 @@ def fetch_poster(movie_id):
     except:
         return "https://via.placeholder.com/500x750?text=Error"
 
-
 # ----------------------------
 # UI
 # ----------------------------
@@ -52,10 +51,9 @@ selected_movie = st.selectbox(
 if st.button("Recommend"):
 
     with st.spinner("Loading recommendations... 🎬"):
+        names, movie_ids = recommend(selected_movie)
 
-        names, movie_ids = recommend(selected_movie)   # ✅ get IDs from model
-
-        # Fetch posters
+        # Fetch posters in parallel
         with concurrent.futures.ThreadPoolExecutor() as executor:
             posters = list(executor.map(fetch_poster, movie_ids))
 
